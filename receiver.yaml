@@ -1,0 +1,32 @@
+
+Resources:
+  VPC:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://kapproject.s3.amazonaws.com/hwk8_CloudFormation.yml
+      Parameters:
+        EnvironmentName: !Ref AWS::StackName
+        VpcCIDR: 10.192.0.0/16
+        Subnet1: 10.192.1.0/24
+        Subnet2: 10.192.2.0/24
+        Subnet3: 10.192.3.0/24
+        Subnet4: 10.192.4.0/24
+        Subnet5: 10.192.5.0/24
+        Subnet6: 10.192.6.0/24
+
+  SecurityGroups:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://kapproject.s3.amazonaws.com/security-groups.yaml
+      Parameters:
+        EnvironmentName: !Ref AWS::StackName
+        VPC: !GetAtt VPC.Outputs.VPC
+
+  myLaunchTemplate:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://kapproject.s3.amazonaws.com/asg_launchConfig.yml
+      Parameters:
+        
+        VPCZoneIdentifier: !GetAtt VPC.Outputs.SubnetPublic1
+        InstanceSecurityGroup: !GetAtt SecurityGroups.Outputs.ECSHostSecurityGroup

@@ -1,0 +1,196 @@
+Outputs:
+  VPC:
+    Description: A reference to the created VPC
+    Value: !Ref VPC
+  SubnetPublic1:
+    Description: A reference to the created VPC
+    Value: !Ref SubnetPublic1
+
+Parameters:
+  EnvironmentName:
+    Description: An environment name that will be prefixed to resource names
+    Type: String
+
+  VpcCIDR:
+    Type: String
+    Default: 10.192.0.0/16
+
+  Subnet1:
+    Type: String
+    Default: 10.192.1.0/24
+
+  Subnet2:
+    Type: String
+    Default: 10.192.2.0/24
+
+  Subnet3:
+    Type: String
+    Default: 10.192.3.0/24
+
+  Subnet4:
+    Type: String
+    Default: 10.192.4.0/24
+
+  Subnet5:
+    Type: String
+    Default: 10.192.5.0/24
+
+  Subnet6:
+    Type: String
+    Default: 10.192.6.0/24
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCIDR
+      Tags:
+        - Key: Name
+          Value: daniel-cloudformation
+        - Key: Environment
+          Value: !Ref EnvironmentName
+
+  InternetGT:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: daniel-cloudformation
+        - Key: Environment
+          Value: !Ref EnvironmentName
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGT
+      VpcId: !Ref VPC 
+ 
+  SubnetPublic1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref Subnet1
+      Tags:
+      - Key: Name
+        Value: daniel-public1
+      - Key: Environment
+        Value: !Ref EnvironmentName
+
+  SubnetPublic2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref Subnet2
+      Tags:
+      - Key: Name
+        Value: daniel-public2
+      - Key: Environment
+        Value: !Ref EnvironmentName
+
+  SubnetPublic3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref Subnet3
+      Tags:
+      - Key: Name
+        Value: daniel-public3
+      - Key: Environment
+        Value: !Ref EnvironmentName
+
+  SubnetPrivate1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref Subnet4
+      Tags:
+      - Key: Name
+        Value: daniel-private1
+      - Key: Environment
+        Value: !Ref EnvironmentName
+
+  SubnetPrivate2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref Subnet5
+      Tags:
+      - Key: Name
+        Value: daniel-private2
+      - Key: Environment
+        Value: !Ref EnvironmentName
+
+  SubnetPrivate3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref Subnet6
+      Tags:
+      - Key: Name
+        Value: daniel-private3
+      - Key: Environment
+        Value: !Ref EnvironmentName
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: PublicTable
+        - Key: Environment
+          Value: !Ref EnvironmentName
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: PrivateTable
+        - Key: Environment
+          Value: !Ref EnvironmentName
+
+  PublicSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref SubnetPublic1
+
+  PublicSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref SubnetPublic2
+
+  PublicSubnet3RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref SubnetPublic3
+
+  PrivateSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref SubnetPrivate1
+
+  PrivateSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref SubnetPrivate2
+
+  PrivateSubnet3RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref SubnetPrivate3
+
+  DefaultPublicRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGT
+        
